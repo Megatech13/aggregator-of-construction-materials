@@ -1,0 +1,25 @@
+<!--подключаем базовый шаблон-->
+{% extends "base.html" %}
+<!--вводим title-->
+{% block title %} Список всех заявок на материал {% endblock %}
+<!--шаблон контента(кроме header и footer)-->
+{% block content %}
+<main>
+    <section>
+        <div class="container py-5">
+            <h1 class="mb-4">Список заявок на материал</h1>
+            {% for wantlist_item in wantlist %}
+            <div class="border my-4 p-3 rounded-lg shadow-sm" style="background-color:#F4F7F9">
+                <p class="h5">Заявка №{{ wantlist_item.id }}</p>
+                <p>Имя заказчика: {{ wantlist_item.author }}</p>
+                <p>Необходимая дата доставки: {{ wantlist_item.delivery_date }}</p>
+                <p>Адрес доставки: {{ wantlist_item.address }}</p>
+                <p>Описание заказа: {{ wantlist_item.description }}</p>
+                <p><a class="btn btn-primary" href="wantlist/{{ wantlist_item.id }}" role="button">Посмотреть заказ</a>
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+{% endblock %} 

@@ -1,0 +1,37 @@
+<!--подключаем базовый шаблон-->
+{% extends "base.html" %}
+<!--вводим title-->
+{% block title %} Контакты {% endblock %}
+<!--шаблон контента(кроме header и footer-->
+{% block content %}
+<main>
+    <section class="py-5">
+        <div class="container">
+            <h1 class="mb-4">Контакты</h1>
+            <p class="h6">mail: megatec13@gmail.com</p>
+            <p class="h6">tel: +7 (929) 944-63-47</p>
+            <form method="post" class="pt-5">
+                {% csrf_token %}
+                <p class="h5">Наша служба поддержки работает каждый день.
+                    Ответим на любые вопросы</p>
+                <p class="text-danger">{{ error }}</p>
+                <label for="name" class="text-muted">Введите ваше имя</label>
+                <div class="input-group mb-2">
+                    <input type="text" id="name" class="form-control" name="name">
+                </div>
+                <label for="email" class="text-muted">Введите почту на которую прислать ответ</label>
+                <div class="input-group mb-2">
+                    <input type="email" id="email" class="form-control" name="email">
+                </div>
+                <label for="text" class="text-muted">Введите текст обращения</label>
+                <div class="input-group mb-4">
+                    <textarea class="form-control" id="text" name="text" aria-label="With textarea"></textarea>
+                </div>
+                <input type="submit" class="btn btn-primary" value="Отправить в техподдержку">
+                <p class="text-success">{{ success }}</p>
+            </form>
+        </div>
+    </section>
+</main>
+{% endblock %}
+

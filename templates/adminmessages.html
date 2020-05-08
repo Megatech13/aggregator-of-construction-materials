@@ -1,0 +1,24 @@
+<!--подключаем базовый шаблон-->
+{% extends "base.html" %}
+<!--вводим title-->
+{% block title %} Сообщения администратору {% endblock %}
+<!--шаблон контента(кроме header и footer)-->
+{% block content %}
+<main>
+    <section class="py-5">
+        <div class="container">
+            <h1 class="mb-4">Тикеты в техподдержку</h1>
+            {% for message in adminmessages %}
+            <div class="border mb-3 p-3 rounded-lg" style="background-color:#F4F7F9; list-style:none">
+                <p>Тикет №{{ message.id }}</p>
+                <p>Имя отправителя: {{ message.name }}</p>
+                <p>Почта отправителя: {{ message.email }}</p>
+                <p>Текст обращения: {{ message.text }}</p>
+                <p><a class="btn btn-primary" href="adminmessage/{{ message.id }}" role="button">Посмотреть тикет</a>
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+{% endblock %}
