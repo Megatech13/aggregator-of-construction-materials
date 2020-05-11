@@ -20,7 +20,7 @@ urlpatterns = [
     path('', views.index),
     path('contacts', views.contacts),
     path('wantlist', views.wantlist),
-    path('wantlist/<int:id>', views.wantlist_item),
+    path('wantlist/<int:id_number>', views.wantlist_item),
     path('newrequest', views.newrequest),
     path('adminmessages', views.adminmessages),
     path('adminmessage/<int:number>', views.adminmessage)

@@ -1,61 +1,59 @@
-from datetime import datetime
+from django.forms import model_to_dict
 from django.shortcuts import render, redirect
-# from mysite.web.models import Requests
-
-
+from web.models import MaterialRequests, Offers
 
 # reqmat_data - requests material - заявки на материал (унести в базу данных)
-reqmat_db = [
-    {
-        'id': 0,
-        'author': "Игорешка",
-        'delivery_date': datetime.now(),
-        'address': 'Путину на дачу',
-        'description': 'Везите весь каширский двор нахуй, тут сами выберем',
-        'offers': [
-            {
-                'id': 0,
-                'name_of_provider': 'Мега',
-                'date': '28.09.2020',
-                'price': '28000 руб'
-            },
-            {
-                'id': 1,
-                'name_of_provider': 'Игорь',
-                'date': '27.09.2020',
-                'price': '2 000 руб'
-            },
-            {
-                'id': 2,
-                'name_of_provider': 'Манас',
-                'date': 'завтра',
-                'price': 'бесплатно'
-            }
-
-        ]
-
-    },
-    {
-        'id': 1,
-        'author': "Мергешка",
-        'delivery_date': datetime.now(),
-        'address': '1-й котляковский переулок д1А стр1',
-        'description': 'Нужен материал для штукатурных работ и стяжки пола'
-                       '1м ротбанд'
-                       'каменный цветок ЦПС дохера надо на 1000м2',
-        'offers': []
-
-    },
-    {
-        'id': 2,
-        'author': "Иполит",
-        'delivery_date': datetime.now(),
-        'address': 'хуй занет куда',
-        'description': 'Нужен материал для ремонта под ключ мозга жены',
-        'offers': []
-
-    }
-]
+# reqmat_db = [
+#     {
+#         'id': 0,
+#         'author': "Игорешка",
+#         'delivery_date': datetime.now(),
+#         'address': 'Путину на дачу',
+#         'description': 'Везите весь каширский двор нахуй, тут сами выберем',
+#         'offers': [
+#             {
+#                 'id': 0,
+#                 'name_of_provider': 'Мега',
+#                 'date': '28.09.2020',
+#                 'price': '28000 руб'
+#             },
+#             {
+#                 'id': 1,
+#                 'name_of_provider': 'Игорь',
+#                 'date': '27.09.2020',
+#                 'price': '2 000 руб'
+#             },
+#             {
+#                 'id': 2,
+#                 'name_of_provider': 'Манас',
+#                 'date': 'завтра',
+#                 'price': 'бесплатно'
+#             }
+#
+#         ]
+#
+#     },
+#     {
+#         'id': 1,
+#         'author': "Мергешка",
+#         'delivery_date': datetime.now(),
+#         'address': '1-й котляковский переулок д1А стр1',
+#         'description': 'Нужен материал для штукатурных работ и стяжки пола'
+#                        '1м ротбанд'
+#                        'каменный цветок ЦПС дохера надо на 1000м2',
+#         'offers': []
+#
+#     },
+#     {
+#         'id': 2,
+#         'author': "Иполит",
+#         'delivery_date': datetime.now(),
+#         'address': 'хуй занет куда',
+#         'description': 'Нужен материал для ремонта под ключ мозга жены',
+#         'offers': []
+#
+#     }
+# ]
 # adminmessages - сообщения администратору (унести в базу данных)
 adminmessages_db = [
     {
@@ -106,14 +104,16 @@ def contacts(request):
 
 def wantlist(request):
     return render(request, 'wantlist.html', {
-        'wantlist': reqmat_db
+        'wantlist': MaterialRequests.objects.all()
     })
 
 
-def wantlist_item(request, id):
+def wantlist_item(request, id_number):
+    reqs = MaterialRequests.objects.filter(id=id_number)
+    req = model_to_dict(reqs[0])
     if request.method == 'GET':
-        if id <= len(reqmat_db):
-            return render(request, 'wantlist_item.html', reqmat_db[id])
+        if len(reqs) == 1:
+            return render(request, 'wantlist_item.html', req)
         else:
             return redirect('/wantlist')
     else:
@@ -122,16 +122,11 @@ def wantlist_item(request, id):
         price = request.POST['price']
 
         if len(name_of_provider) == 0 or len(date) == 0 or len(price) == 0:
-            return render(request, 'wantlist_item.html', reqmat_db[id])
+            return render(request, 'wantlist_item.html', req)
 
-        reqmat_db[id]['offers'].append({
-            'id': len(reqmat_db[id]['offers']),
-            'name_of_provider': name_of_provider,
-            'date': date,
-            'price': price
-        })
-
-        return render(request, 'wantlist_item.html', reqmat_db[id])
+        Offers(name_of_provider=name_of_provider,
+               date=date, price=price).save()
+        return render(request, 'wantlist_item.html', req)
 
 
 def newrequest(request):
@@ -146,14 +141,12 @@ def newrequest(request):
         if len(delivery_date) == 0 or len(address) == 0 or len(description) == 0 or len(author) == 0:
             return render(request, 'newrequest.html', {'error': 'Не заполненны поля'})
 
-        reqmat_db.append({
-            'id': len(reqmat_db),
-            'author': author,
-            'delivery_date': delivery_date,
-            'address': address,
-            'description': description
-        })
-        # Requests(delivery_date=delivery_date, address=address, description=description, author=author)
+        MaterialRequests(
+            author=author,
+            delivery_date=delivery_date,
+            address=address,
+            description=description.replace('\n', '<br>')
+        ).save()
         return redirect('/wantlist')
 
 
